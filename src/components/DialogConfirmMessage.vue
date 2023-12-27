@@ -10,8 +10,8 @@
         dense
         icon="close"
         size="sm"
-        v-close-popup
         class="close-button"
+        v-close-popup
       />
 
       <q-form @submit="onDialogOK()">
@@ -57,11 +57,11 @@ import { useDialogPluginComponent } from "quasar";
 export default defineComponent({
   name: "DialogConfirmMessage",
   props: {
-    content: {
+    title: {
       type: String,
       default: "",
     },
-    title: {
+    content: {
       type: String,
       default: "",
     },

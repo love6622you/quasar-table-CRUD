@@ -19,17 +19,18 @@
         </div>
       </div>
       <QTable
-        :columns="state.columns"
-        :rows="state.rows"
+        :columns="columns"
+        :rows="rows"
+        :loading="loading"
         selection="multiple"
-        v-model:selected="state.selected"
+        v-model:selected="selected"
       />
     </div>
   </q-page>
 </template>
 
 <script>
-import { onMounted, reactive } from "vue";
+import { onMounted, reactive, toRefs } from "vue";
 import { useQuasar, uid, date } from "quasar";
 import MemberApi from "src/api/Member";
 import QTable from "src/components/QTable.vue";
@@ -94,15 +95,16 @@ export default {
       ],
       rows: [],
       selected: [],
+      loading: false,
     });
 
     const addMember = () => {
       const birthday = date.formatDate(new Date(), "YYYY-MM-DD");
 
       state.rows.unshift({
-        name: "test" + uid().slice(0, Math.random() * 10),
+        name: uid().slice(0, Math.random() * 10 + 10),
         cellphone: "0912345678",
-        email: uid().slice(0, 1 + Math.random() * 10) + "@gmail.com",
+        email: uid().slice(0, Math.random() * 10 + 10) + "@gmail.com",
         gender: Math.random() > 0.5 ? "男" : "女",
         birthday,
       });
@@ -135,10 +137,13 @@ export default {
 
     const fetehData = async () => {
       try {
+        state.loading = true;
         const res = await MemberApi.getMembers();
         state.rows = res.data.members;
       } catch (error) {
         $q.notify({ type: "negative", message: error.message });
+      } finally {
+        state.loading = false;
       }
     };
 
@@ -147,7 +152,7 @@ export default {
     });
 
     return {
-      state,
+      ...toRefs(state),
       addMember,
       deleteMember,
     };
@@ -156,6 +161,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .block-item {
+  width: 100%;
   min-width: 400px;
 }
 </style>

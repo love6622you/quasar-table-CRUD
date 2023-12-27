@@ -16,9 +16,10 @@
       <q-input
         borderless
         dense
+        clearable
         debounce="500"
-        v-model="filter"
         placeholder="Search"
+        v-model="filter"
       >
         <template v-slot:append>
           <q-icon name="search" />
@@ -27,7 +28,11 @@
     </template>
 
     <template #body-cell="props">
-      <q-td :props="props">
+      <q-td
+        :props="props"
+        @click="onClickCell(props.value)"
+        style="cursor: pointer"
+      >
         {{ props.value }}
         <q-tooltip anchor="bottom middle" self="center middle">
           {{ props.value }}
@@ -37,7 +42,8 @@
   </q-table>
 </template>
 <script>
-import { onMounted, ref } from "vue";
+import { useQuasar, copyToClipboard } from "quasar";
+import { ref } from "vue";
 import useModelWrapper from "src/hooks/useModelWrapper";
 
 export default {
@@ -57,12 +63,26 @@ export default {
   },
   emits: ["update:selected"],
   setup(props, { emit }) {
+    const $q = useQuasar();
+
     const filter = ref("");
-    const modelSelected = ref(useModelWrapper(props, emit, "selected"));
+    const modelSelected = useModelWrapper(props, emit, "selected");
+
+    const onClickCell = (value) => {
+      copyToClipboard(value).then(() => {
+        $q.notify({
+          message: "已複製",
+          color: "positive",
+          icon: "done",
+        });
+      });
+    };
 
     return {
       filter,
       modelSelected,
+
+      onClickCell,
     };
   },
 };
