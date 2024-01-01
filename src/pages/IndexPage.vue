@@ -1,22 +1,77 @@
 <template>
   <q-page class="row justify-left q-pa-lg">
     <div class="block-item">
-      <div class="row justify-between items-center">
-        <div class="text-h6">員工基本資訊</div>
-        <div>
-          <q-btn
-            class="q-mr-sm"
-            color="primary"
-            label="新增"
-            @click="addMember"
-          />
-          <q-btn
-            color="white"
-            text-color="black"
-            label="刪除"
-            @click="deleteMember"
-          />
-        </div>
+      <div class="text-h6">員工基本資訊</div>
+
+      <q-form @submit="onSearch">
+        <section class="row q-gutter-y-md q-pt-md">
+          <div class="col-12 col-sm-6 col-md-3 q-px-xs">
+            <div class="text-weight-bold">姓名</div>
+            <q-input
+              filled
+              dense
+              hide-bottom-space
+              class="col-12"
+              v-model.trim="filters.name"
+            />
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3 q-px-xs">
+            <div class="text-weight-bold">手機</div>
+            <q-input
+              filled
+              dense
+              hide-bottom-space
+              class="col-12"
+              v-model.trim="filters.cellphone"
+            />
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3 q-px-xs">
+            <div class="text-weight-bold">性別</div>
+            <q-select
+              filled
+              dense
+              hide-bottom-space
+              class="col-12"
+              :options="['男', '女']"
+              v-model="filters.gender"
+            />
+          </div>
+
+          <div class="col-12 col-sm-6 col-md-3 q-px-xs">
+            <div class="text-weight-bold">信箱</div>
+            <q-input
+              filled
+              dense
+              hide-bottom-space
+              class="col-12"
+              v-model.trim="filters.email"
+            />
+          </div>
+
+          <div class="col-12 text-right">
+            <q-btn class="q-mr-sm" color="primary" label="查詢" type="submit" />
+            <q-btn class="white" label="重置" @click="onReset" />
+          </div>
+        </section>
+      </q-form>
+
+      <q-separator spaced="16px" />
+
+      <div class="text-right">
+        <q-btn
+          class="q-mr-sm"
+          color="primary"
+          label="新增"
+          @click="addMember"
+        />
+        <q-btn
+          color="white"
+          text-color="black"
+          label="刪除"
+          @click="deleteMember"
+        />
       </div>
       <QTable
         :columns="columns"
@@ -100,6 +155,12 @@ export default {
       ],
       rows: [],
       selected: [],
+      filters: {
+        name: "",
+        cellphone: "",
+        email: "",
+        gender: "",
+      },
       loading: false,
     });
 
@@ -153,6 +214,31 @@ export default {
       }
     };
 
+    const onSearch = async () => {
+      try {
+        state.loading = true;
+        const res = await MemberApi.getMember({
+          filter: state.filters,
+          sort: "-name",
+        });
+        state.rows = res.data.members;
+      } catch (error) {
+        $q.notify({ type: "negative", message: error.message });
+      } finally {
+        state.loading = false;
+      }
+    };
+
+    const onReset = () => {
+      state.filters = {
+        name: "",
+        cellphone: "",
+        email: "",
+        gender: "",
+      };
+      fetehData();
+    };
+
     onMounted(() => {
       fetehData();
     });
@@ -161,6 +247,8 @@ export default {
       ...toRefs(state),
       addMember,
       deleteMember,
+      onSearch,
+      onReset,
     };
   },
 };

@@ -4,8 +4,8 @@ const Member = {
   getMembers: () => {
     return api.get("/members");
   },
-  getMember: (keyword) => {
-    return api.get("/members/search/" + keyword);
+  getMember: (data) => {
+    return api.post("/members/search", data);
   },
 };
 
