@@ -215,6 +215,12 @@ export default {
     };
 
     const onSearch = async () => {
+      const isAnyValue = Object.values(state.filters).some((value) => value);
+      if (!isAnyValue) {
+        $q.notify({ type: "negative", message: "請輸入查詢條件" });
+        return;
+      }
+
       try {
         state.loading = true;
         const res = await MemberApi.getMember({
