@@ -31,16 +31,18 @@
           <q-btn
             v-if="cancel"
             outline
-            size="md"
-            class="col-4"
+            dense
+            unelevated
+            padding="sm xl"
             :label="cancelText"
             @click="onDialogCancel()"
           />
           <q-btn
             v-if="confirm"
-            size="md"
+            dense
+            unelevated
+            padding="sm xl"
             color="primary"
-            class="col-4"
             type="submit"
             :label="confirmText"
           />

@@ -31,10 +31,11 @@
 
 <script>
 import { onMounted, reactive, toRefs } from "vue";
-import { useQuasar, uid, date } from "quasar";
+import { useQuasar } from "quasar";
 import MemberApi from "src/api/Member";
 import QTable from "src/components/QTable.vue";
 import DialogConfirmMessage from "src/components/DialogConfirmMessage.vue";
+import DialogCreateMember from "src/partials/Home/DialogCreateMember.vue";
 
 export default {
   name: "IndexPage",
@@ -84,6 +85,10 @@ export default {
           format: (val) => {
             if (val === undefined || val === null) return "";
 
+            // 如果字串符合 ####/##/## 的格式，直接回傳
+            if (/^\d{4}\/\d{2}\/\d{2}$/.test(val)) return val;
+
+            // 否則，將字串轉換成日期格式，再轉換成指定格式
             const [_year, _month, _date] = val.split("T")[0].split("-");
             let year = _year;
             let month = _month.padStart(2, "0");
@@ -99,14 +104,15 @@ export default {
     });
 
     const addMember = () => {
-      const birthday = date.formatDate(new Date(), "YYYY-MM-DD");
-
-      state.rows.unshift({
-        name: uid().slice(0, Math.random() * 10 + 10),
-        cellphone: "0912345678",
-        email: uid().slice(0, Math.random() * 10 + 10) + "@gmail.com",
-        gender: Math.random() > 0.5 ? "男" : "女",
-        birthday,
+      $q.dialog({
+        component: DialogCreateMember,
+        componentProps: {},
+      }).onOk((payload) => {
+        state.rows.unshift(payload);
+        $q.notify({
+          type: "positive",
+          message: `新增成功`,
+        });
       });
     };
 
